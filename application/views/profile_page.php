@@ -1,41 +1,33 @@
-<html>
 <!--
-Main page
+Profile page
 @author	liushu@qinggukeji.com
 //-->
 
-<?php
-  if (isset($this->session->userdata['logged_in'])) {
-    $login_uuid = $this->session->userdata['logged_in']['login_uuid'];
-  } else {
-    header('location: '.site_url('user_authentication/show_login'));
-  }
-?>
-
-<head>
-  <title><?php echo lang('profile_page'); ?></title>
-  <link rel="stylesheet" type="text/css" href="<?php echo base_url('css/style.css'); ?>">
-  <link href="http://fonts.googleapis.com/css?family=Source+Sans+Pro|Open+Sans+Condensed:300|Raleway" rel="stylesheet" type="text/css">
-</head>
-
-<body>
-  <div id="profile">
+<div class="container-fluid master">
+  <div class="jumbotron">
     <?php
+      $login_uuid = $this->session->userdata['logged_in']['login_uuid'];
       $profile = $this->profile->query_profile($login_uuid);
-      echo lang('welcome').'<b id="welcome"><i>'.$profile['company'].'</i> !</b>';
-      echo '<br/>';
-      echo lang('currency').': '.lang($profile['currency']);
-      echo '<br/>';
-      echo lang('balance').': '.$profile['balance'];
-      echo '<br/><br/>';
+      $owner = empty($profile['company']) ? $this->session->userdata['logged_in']['email'] : $profile['company'];
+    ?>
+    <p><?=$owner . '-' . lang('profile_page')?></p>
+    <?php
+      $this->table->set_template(array('table_open' => '<table class="table table-striped table-bordered">'));
 
-      echo '<a href="'.site_url('ad_data_collection/show_creative_page').'">'.lang('creative_page').'</a>';
-      echo '<br/><br/>';
-      echo '<a href="'.site_url('result_display/show_result').'">'.lang('result_page').'</a>';
-      echo '<br/><br/>';
-      echo '<b id="logout"><a href="'.site_url('user_authentication/logout').'">'.lang('logout').'</a></b>';
+      $this->table->set_heading(lang('company'),
+                                lang('currency'),
+                                lang('balance'),
+                                '');
+      $edit_btn = '<a role="button" class="btn btn-xs btn-primary" href="' .
+        site_url('user_management/show_profile_form/' . $login_uuid) .
+        '">' . lang('edit') . '</a>';
+      $this->table->add_row($profile['company'],
+                            $profile['currency'],
+                            number_format($profile['balance'], 2),
+                            $edit_btn);
+
+      echo $this->table->generate();
+      $this->table->clear();
     ?>
   </div>
-</body>
-
-</html>
+</div>

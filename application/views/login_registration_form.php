@@ -1,67 +1,54 @@
-<html>
 <!--
-Form for registration & login
+Common form for registration & login
 @author	liushu@qinggukeji.com
 //-->
 
-<?php
-  if (isset($this->session->userdata['logged_in'])) {
-    header('location: '.site_url('user_authentication/login'));
-  }
-?>
-
-<head>
-  <title><?php echo lang(isset($register) ? 'register' : 'login') ?></title>
-  <link rel="stylesheet" type="text/css" href="<?php echo base_url('css/style.css'); ?>">
-  <link href="http://fonts.googleapis.com/css?family=Source+Sans+Pro|Open+Sans+Condensed:300|Raleway" rel="stylesheet" type="text/css">
-</head>
-
-<body>
-  <?php
-    if (isset($message)) {
-      echo '<div class="message">';
-      echo $message;
-      echo '</div>';
-    }
-  ?>
-  <div id="main">
-    <div id="login">
-      <?php
-        echo '<h2>';
-        echo lang(isset($register) ? 'register' : 'login');
-        echo '</h2><hr/>';
-
-        echo '<div class="error_msg">';
-        if (isset($error_message)) {
-          echo $error_message;
-        }
-        echo validation_errors();
-        echo '</div>';
-
-        echo form_open(isset($register) ? 'user_authentication/register' : 'user_authentication/login');
-
-        echo form_label(lang('email'));
-        echo form_input(array('type'=>'Email', 'name'=>'email', 'value'=> set_value('email'), 'placeholder'=>'yourname@email.com'));
-        echo '<br/><br/>';
-        echo form_label(lang('password'));
-        echo form_password(array('name'=>'password', 'placeholder'=>'************'));
-        echo '<br/><br/>';
-        if (isset($register)) {
-          echo form_label(lang('company'));
-          echo form_input('company', set_value('company'));
-          echo '<br/><br/>';
-        }
-        echo form_submit('submit', lang(isset($register) ? 'register' : 'login'));
-        echo form_close();
-
-        if (isset($register)) {
-          echo '<a href="'.site_url('user_authentication/index').'">'.lang('login').'</a>';
-        } else {
-          echo '<a href="'.site_url('user_authentication/show_registration').'">'.lang('register').'</a>';
-        }
-      ?>
+<div class="container-fluid master">
+  <div class="jumbotron">
+    <?php
+      $process_array = array(
+        'register' => 'user_authentication/register',
+        'login' => 'user_authentication/login',
+      );
+      $show_array = array(
+        'register' => 'user_authentication/show_registration',
+        'login' => 'user_authentication/show_login',
+      );
+      $page_array = array(
+        'register' => 'registration_form',
+        'login' => 'login_form',
+      );
+      $cur_state = isset($register) ? 'register' : 'login';
+      $other_state = isset($register) ? 'login' : 'register';
+    ?>
+    <?php
+      if (isset($success)) echo '<div class="alert alert-success">' . $success . '</div>';
+      if (isset($error)) echo '<div class="alert alert-danger">' . $error . validation_errors() . '</div>';
+    ?>
+    <p><?=lang($page_array[$cur_state])?></p>
+    <?=form_open($process_array[$cur_state], array('class' => 'form-horizontal', 'role' => 'form'))?>
+    <div class="form-group">
     </div>
+    <div class="form-group">
+      <?=form_label(lang('email'), 'email', array('class' => 'control-label col-sm-2'))?>
+      <div class="col-sm-10">
+        <?=form_input(array('type' => 'email', 'name' => 'email', 'id' => 'email', 'class' => 'form-control', 'placeholder' => 'yourname@email.com'), set_value('email'))?>
+      </div>
+    </div>
+    <div class="form-group">
+      <?=form_label(lang('password'), 'password', array('class' => 'control-label col-sm-2'))?>
+      <div class="col-sm-10">
+        <?=form_password(array('name' => 'password', 'id' => 'password', 'class' => 'form-control', 'placeholder' => '************'))?>
+      </div>
+    </div>
+    <div class="form-group"> 
+      <div class="col-sm-offset-2 col-sm-10">
+        <?=form_submit(array('class' => 'btn btn-primary'), lang($cur_state))?>
+        <a role="button" class="btn btn-default" href="<?=site_url($show_array[$other_state])?>">
+          <?=lang($page_array[$other_state])?>
+        </a>
+      </div>
+    </div>
+    <?=form_close()?>
   </div>
-</body>
-
-</html>
+</div>

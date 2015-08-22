@@ -4,7 +4,7 @@
  *
  * @author	liushu@qinggukeji.com
  */
-Class Result_display extends CI_Controller {
+Class Result_display extends QG_Controller {
 
   public function __construct() {
     parent::__construct();
@@ -14,7 +14,7 @@ Class Result_display extends CI_Controller {
   }
 
   public function show_result() {
-    $this->load->view('result_page');
+    $this->header_view('result_page');
   }
 
 }

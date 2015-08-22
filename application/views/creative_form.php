@@ -1,57 +1,48 @@
-<html>
 <!--
 Form to set ad creative
 @author	liushu@qinggukeji.com
 //-->
 
-<?php
-  if (!isset($this->session->userdata['logged_in'])) {
-    header('location: '.site_url());
-  }
-?>
-
-<head>
-  <title><?php echo lang('creative_form'); ?></title>
-</head>
-
-<body>
-  <?php
-    if (isset($message)) {
-      echo '<div class="message">';
-      echo $message;
-      echo '</div>';
-    }
-  ?>
-  <div id="main">
-    <div id="creative_info">
-      <?php
-        echo '<h2>'.lang('creative_form').'</h2><hr/>';
-
-        echo '<div class="error_msg">';
-        if (isset($error_message)) {
-          echo $error_message;
-        }
-        echo validation_errors();
-        echo '</div>';
-
-        echo form_open('ad_data_collection/set_creative/'.$login_uuid.'/'.$creative_uuid);
-        $init = $this->ad_data->query_creative($creative_uuid);
-
-        echo form_label(lang('title'));
-        echo form_input('title', set_value('title', $init['title']));
-        echo '<br/><br/>';
-        echo form_label(lang('description'));
-        echo form_input('description', set_value('description', $init['description']));
-        echo '<br/><br/>';
-        echo form_label(lang('image'));
-        echo form_input('image', set_value('image', $init['image']));
-        echo '<br/><br/>';
-
-        echo form_submit('submit', lang('confirm'));
-        echo form_close();
-      ?>
+<div class="container-fluid master">
+  <div class="jumbotron">
+    <?php
+      if (isset($error)) echo '<div class="alert alert-danger">' . $error . validation_errors() . '</div>';
+    ?>
+    <p>
+      <?=lang('creative_form')?>
+      <a role="button" class="btn btn-sm btn-default"
+         href="<?=site_url('ad_data_collection/show_creative_page')?>">
+        <?=lang('return_to').'-'.lang('creative_page')?>
+      </a>
+    </p>
+    <hr/>
+    <?php
+      $init = $this->ad_data->query_creative($creative_uuid);
+    ?>
+    <?=form_open('ad_data_collection/set_creative/' . $login_uuid . '/' . $creative_uuid, array('class' => 'form-horizontal', 'role' => 'form'))?>
+    <div class="form-group">
+      <?=form_label(lang('title'), 'title', array('class' => 'control-label col-sm-2'))?>
+      <div class="col-sm-4">
+        <?=form_input(array('name' => 'title', 'id' => 'title', 'class' => 'form-control'), set_value('title', $init['title']))?>
+      </div>
     </div>
+    <div class="form-group">
+      <?=form_label(lang('description'), 'description', array('class' => 'control-label col-sm-2'))?>
+      <div class="col-sm-6">
+        <?=form_textarea(array('name' => 'description', 'id' => 'description', 'class' => 'form-control'), set_value('description', $init['description']))?>
+      </div>
+    </div>
+    <div class="form-group">
+      <?=form_label(lang('image'), 'image', array('class' => 'control-label col-sm-2'))?>
+      <div class="col-sm-6">
+        <?=form_input(array('name' => 'image', 'id' => 'image', 'class' => 'form-control'), set_value('image', $init['image']))?>
+      </div>
+    </div>
+    <div class="form-group"> 
+      <div class="col-sm-offset-2 col-sm-10">
+        <?=form_submit(array('class' => 'btn btn-primary'), lang('submit'))?>
+      </div>
+    </div>
+    <?=form_close()?>
   </div>
-</body>
-
-</html>
+</div>

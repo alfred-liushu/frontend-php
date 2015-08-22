@@ -6,6 +6,12 @@
  */
 defined('BASEPATH') OR exit('No direct script access allowed');
 
+$lang['yes'] = '是';
+$lang['no'] = '否';
+$lang['confirm'] = '确定';
+$lang['cancel'] = '取消';
+$lang['error'] = '错误';
+
 $lang['register_success'] = '注册成功！';
 $lang['logout_success'] = '已退出登陆！';
 

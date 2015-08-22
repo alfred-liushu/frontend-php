@@ -1,0 +1,126 @@
+#用户组权限
+CREATE TABLE usergroup_permission
+(
+  usergroup char(3) NOT NULL,
+  permission varchar(32) NOT NULL,
+  PRIMARY KEY (usergroup, permission)
+) DEFAULT CHARACTER SET utf8;
+INSERT INTO usergroup_permission(usergroup,permission) 
+VALUES ("ADM","view_creative"), ("ADM","add_creative"), ("ADM","mod_creative"), ("ADM","del_creative"), ("ADM","view_budget"), ("ADM","add_budget"), ("ADM","mod_budget"), ("ADM","del_budget"), ("ADM","mod_balance"), ("OPS","view_creative"), ("OPS","add_creative"), ("OPS","mod_creative"), ("OPS","view_budget"), ("OPS","add_budget"), ("OPS","mod_budget"), ("OPS","mod_balance"), ("CLI","view_creative"), ("CLI","add_creative"), ("CLI","mod_creative"), ("CLI","view_budget"), ("CLI","add_budget"), ("CLI","mod_budget"), ("RDR","view_creative"), ("RDR","view_budget");
+
+
+#国家（ISO 3166大写）-语言（ISO 639-1小写）组合
+CREATE TABLE country_language
+(
+  country char(2) NOT NULL,
+  language char(2) NOT NULL,
+  PRIMARY KEY (country, language)
+) DEFAULT CHARACTER SET utf8;
+INSERT INTO country_language(country,language)
+VALUES ("US","en"), ("GB","en"), ("JP","ja"), ("DE","de"), ("FR","fr");
+
+
+#币种及其汇率（ISO 4217，汇率需更新）
+CREATE TABLE currency
+(
+  currency char(3) NOT NULL,
+  can_pay bool DEFAULT false,
+  can_charge bool DEFAULT false,
+  rate double DEFAULT 0.0,
+  updated timestamp DEFAULT now() ON UPDATE now(),
+  PRIMARY KEY (currency)
+) DEFAULT CHARACTER SET utf8;
+INSERT INTO currency(currency,can_pay,can_charge,rate)
+VALUES ("USD",true,false,6.31919519), ("CNY",false,true,1.0);
+
+
+#用户登陆
+CREATE TABLE login
+(
+  id int NOT NULL AUTO_INCREMENT,
+  uuid char(36) NOT NULL DEFAULT '',
+  email varchar(64) NOT NULL,
+  password varchar(255) NOT NULL,
+  created timestamp DEFAULT '0000-00-00 00:00:00', 
+  updated timestamp DEFAULT now() ON UPDATE now(),
+  PRIMARY KEY (id)
+) DEFAULT CHARACTER SET utf8;
+CREATE UNIQUE INDEX login_index_uuid
+  ON login (uuid);
+CREATE UNIQUE INDEX login_index_email
+  ON login (email);
+CREATE TRIGGER login_before_insert
+  BEFORE INSERT ON login
+  FOR EACH ROW
+  SET new.uuid = uuid(), new.created = now();
+
+
+#用户信息
+CREATE TABLE profile
+(
+  id int NOT NULL AUTO_INCREMENT,
+  login_uuid char(36) NOT NULL,
+  usergroup char(3) NOT NULL DEFAULT 'RDR',
+  company varchar(255) NOT NULL DEFAULT '',
+  currency char(3) NOT NULL DEFAULT 'CNY',
+  balance double NOT NULL DEFAULT 0.0,
+  created timestamp DEFAULT '0000-00-00 00:00:00', 
+  updated timestamp DEFAULT now() ON UPDATE now(),
+  PRIMARY KEY (id)
+) DEFAULT CHARACTER SET utf8;
+CREATE UNIQUE INDEX profile_index_login_uuid
+  ON profile (login_uuid);
+CREATE TRIGGER profile_before_insert
+  BEFORE INSERT ON profile
+  FOR EACH ROW
+  SET new.created = now();
+
+
+#用户输入广告内容
+CREATE TABLE creative
+(
+  id int NOT NULL AUTO_INCREMENT,
+  uuid char(36) NOT NULL DEFAULT '',
+  login_uuid char(36) NOT NULL,
+  title varchar(255) NOT NULL DEFAULT '',
+  description varchar(255) NOT NULL DEFAULT '',
+  image varchar(255) NOT NULL DEFAULT '',
+  created timestamp DEFAULT '0000-00-00 00:00:00', 
+  updated timestamp DEFAULT now() ON UPDATE now(),
+  PRIMARY KEY (id)
+) DEFAULT CHARACTER SET utf8;
+CREATE UNIQUE INDEX creative_index_uuid
+  ON creative (uuid);
+CREATE INDEX creative_index_login_uuid
+  ON creative (login_uuid);
+CREATE TRIGGER creative_before_insert
+  BEFORE INSERT ON creative
+  FOR EACH ROW
+  SET new.uuid = uuid(), new.created = now();
+
+
+#用户输入广告预算
+CREATE TABLE budget
+(
+  id int NOT NULL AUTO_INCREMENT,
+  uuid char(36) NOT NULL DEFAULT '',
+  creative_uuid char(36) NOT NULL,
+  country char(2) NOT NULL DEFAULT 'US',
+  language char(2) NOT NULL DEFAULT 'en',
+  currency char(3) NOT NULL DEFAULT 'CNY',
+  monthly_budget double NOT NULL DEFAULT 0.0,
+  start_time date DEFAULT '0000-00-00', 
+  end_time date DEFAULT '0000-00-00', 
+  auto_continue bool DEFAULT false,
+  created timestamp DEFAULT '0000-00-00 00:00:00', 
+  updated timestamp DEFAULT now() ON UPDATE now(),
+  PRIMARY KEY (id)
+) DEFAULT CHARACTER SET utf8;
+CREATE UNIQUE INDEX budget_index_uuid
+  ON budget (uuid);
+CREATE INDEX budget_index_creative_uuid
+  ON budget (creative_uuid);
+CREATE TRIGGER budget_before_insert
+  BEFORE INSERT ON budget
+  FOR EACH ROW
+  SET new.uuid = uuid(), new.created = now();

@@ -4,18 +4,18 @@
  *
  * @author	liushu@qinggukeji.com
  */
-Class Value_set extends CI_Model {
+Class Value_set extends QG_Model {
 
   public function get_country_set() {
     $this->db->distinct();
     $this->db->select('country');
-    return array_column($this->db->get('country_language')->result_array(), 'country');
+    $array = $this->db->get('country_language')->result_array();
+    return array_column($array, 'country');
   }
 
   public function get_charge_currency_set() {
-    $this->db->select('currency');
-    $this->db->where('can_charge', true);
-    return array_column($this->db->get('currency')->result_array(), 'currency');
+    $array = $this->query_by_id('currency', 'currency', 'can_charge', true);
+    return array_column($array, 'currency');
   }
 
 }
